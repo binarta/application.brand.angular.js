@@ -206,8 +206,9 @@
                                 '<td>' +
                                     '<div style="margin-top:15px;">' +
                                         '<img ng-src="{{logoSrc}}" style="max-width:160px; margin: 0 15px 15px 0;">' +
-                                        '<button type="button" class="btn btn-default" ng-click="browseLogo()" ng-show="choice == \'logo\'" style="margin: 0 15px 15px 0;">' +
-                                            'browse' +
+                                        '<button type="button" class="btn btn-default" ng-click="browseLogo()" ' +
+                                            'i18n code="application.brand.browse.button" read-only ng-bind="::var" ' +
+                                            'ng-show="choice == \'logo\'" style="margin: 0 15px 15px 0;">' +
                                         '</button>' +
                                     '</div>' +
                                 '</td>' +
