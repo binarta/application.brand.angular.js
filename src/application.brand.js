@@ -172,7 +172,10 @@
 
                         '<div ng-show="working">' +
                             '<i class="fa fa-spinner fa-spin"></i> ' +
-                            '<span i18n code="application.brand.{{workingState}}" read-only ng-bind="var"></span>' +
+                            '<span ng-switch="workingState">' +
+                                '<span ng-switch-when="logo.uploading" i18n code="application.brand.logo.uploading" read-only ng-bind="::var"></span>' +
+                                '<span ng-switch-default i18n code="application.brand.saving" read-only ng-bind="::var"></span>' +
+                            '</span>' +
                         '</div>' +
 
                         '<table class="table" ng-hide="working">' +

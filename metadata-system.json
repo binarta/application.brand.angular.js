@@ -5,36 +5,32 @@
       "application.brand.choice.name": "Tekst",
       "application.brand.choice.logo": "Logo",
       "application.brand.browse.button": "bladeren",
-      "application.brand.config.updating": "Bezig met opslaan...",
+      "application.brand.saving": "Bezig met opslaan...",
       "application.brand.logo.uploading": "Bezig met uploaden...",
-      "application.brand.name.updating": "Bezig met opslaan...",
       "application.brand.error": "Er is iets misgegaan. Gelieve opnieuw te proberen."
     }, "en":{
       "application.brand.choose.one": "Choose one:",
       "application.brand.choice.name": "Text",
       "application.brand.choice.logo": "Logo",
       "application.brand.browse.button": "browse",
-      "application.brand.config.updating": "Saving...",
+      "application.brand.saving": "Saving...",
       "application.brand.logo.uploading": "Uploading...",
-      "application.brand.name.updating": "Saving...",
       "application.brand.error": "Something went wrong. Please try again."
     }, "fr":{
       "application.brand.choose.one": "Choose one:",
       "application.brand.choice.name": "Text",
       "application.brand.choice.logo": "Logo",
       "application.brand.browse.button": "browse",
-      "application.brand.config.updating": "Saving...",
+      "application.brand.saving": "Saving...",
       "application.brand.logo.uploading": "Uploading...",
-      "application.brand.name.updating": "Saving...",
       "application.brand.error": "Something went wrong. Please try again."
     }, "de":{
       "application.brand.choose.one": "Choose one:",
       "application.brand.choice.name": "Text",
       "application.brand.choice.logo": "Logo",
       "application.brand.browse.button": "browse",
-      "application.brand.config.updating": "Saving...",
+      "application.brand.saving": "Saving...",
       "application.brand.logo.uploading": "Uploading...",
-      "application.brand.name.updating": "Saving...",
       "application.brand.error": "Something went wrong. Please try again."
     }
   }
