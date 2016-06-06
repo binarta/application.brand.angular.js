@@ -15,11 +15,11 @@ describe('application.pages', function () {
         .value('config', {})
         .factory('configReader', ['$q', function ($q) {
             configReaderDeferred = $q.defer();
-            return jasmine.createSpy('configReader').andReturn(configReaderDeferred.promise);
+            return jasmine.createSpy('configReader').and.returnValue(configReaderDeferred.promise);
         }])
         .factory('configWriter', ['$q', function ($q) {
             configWriterDeferred = $q.defer();
-            return jasmine.createSpy('configWriter').andReturn(configWriterDeferred.promise);
+            return jasmine.createSpy('configWriter').and.returnValue(configWriterDeferred.promise);
         }]);
 
     angular.module('toggle.edit.mode', [])
@@ -35,8 +35,8 @@ describe('application.pages', function () {
             i18nResolveDeferred = $q.defer();
             i18nTranslateDeferred = $q.defer();
 
-            this.resolve = jasmine.createSpy('translate').andReturn(i18nResolveDeferred.promise);
-            this.translate = jasmine.createSpy('resolve').andReturn(i18nTranslateDeferred.promise);
+            this.resolve = jasmine.createSpy('translate').and.returnValue(i18nResolveDeferred.promise);
+            this.translate = jasmine.createSpy('resolve').and.returnValue(i18nTranslateDeferred.promise);
         }]);
 
     angular.module('image-management', [])
@@ -44,14 +44,14 @@ describe('application.pages', function () {
             getImagePathDeferred = $q.defer();
             uploadDeferred = $q.defer();
 
-            this.getImagePath = jasmine.createSpy('getImagePath').andReturn(getImagePathDeferred.promise);
-            this.fileUpload = jasmine.createSpy('fileUpload').andReturn({
+            this.getImagePath = jasmine.createSpy('getImagePath').and.returnValue(getImagePathDeferred.promise);
+            this.fileUpload = jasmine.createSpy('fileUpload').and.returnValue({
                 click: function () {
                     fileUploadClicked = true;
                 }
             });
             this.validate = jasmine.createSpy('validate');
-            this.upload = jasmine.createSpy('upload').andReturn(uploadDeferred.promise);
+            this.upload = jasmine.createSpy('upload').and.returnValue(uploadDeferred.promise);
         }]);
 
     beforeEach(module('application.brand'));
@@ -214,7 +214,7 @@ describe('application.pages', function () {
 
             describe('on edit mode opened', function () {
                 beforeEach(function () {
-                    editMode.bindEvent.calls[0].args[0].onClick();
+                    editMode.bindEvent.calls.first().args[0].onClick();
                 });
 
                 describe('with renderer scope', function () {
@@ -222,7 +222,7 @@ describe('application.pages', function () {
 
                     beforeEach(function () {
                         i18nResolveDeferred.resolve('brand name');
-                        rendererScope = editModeRenderer.open.calls[0].args[0].scope;
+                        rendererScope = editModeRenderer.open.calls.first().args[0].scope;
                         scope.$digest();
                     });
 
@@ -263,9 +263,9 @@ describe('application.pages', function () {
 
                         describe('new valid logo is selected', function () {
                             beforeEach(function () {
-                                imageManagement.validate.andReturn([]);
+                                imageManagement.validate.and.returnValue([]);
 
-                                imageManagement.fileUpload.calls[0].args[0].add(null, validFile);
+                                imageManagement.fileUpload.calls.first().args[0].add(null, validFile);
                             });
 
                             it('logo is validated', function () {
@@ -281,9 +281,9 @@ describe('application.pages', function () {
 
                         describe('new invalid logo is selected', function () {
                             beforeEach(function () {
-                                imageManagement.validate.andReturn(['invalid']);
+                                imageManagement.validate.and.returnValue(['invalid']);
 
-                                imageManagement.fileUpload.calls[0].args[0].add(null, {});
+                                imageManagement.fileUpload.calls.first().args[0].add(null, {});
                             });
 
                             it('violations are on rendererScope', function () {
@@ -327,8 +327,8 @@ describe('application.pages', function () {
                     describe('on save and logo changed', function () {
                         beforeEach(function () {
                             rendererScope.browseLogo();
-                            imageManagement.validate.andReturn([]);
-                            imageManagement.fileUpload.calls[0].args[0].add(null, validFile);
+                            imageManagement.validate.and.returnValue([]);
+                            imageManagement.fileUpload.calls.first().args[0].add(null, validFile);
 
                             rendererScope.save();
                         });
@@ -405,7 +405,7 @@ describe('application.pages', function () {
 
             describe('on edit mode opened', function () {
                 beforeEach(function () {
-                    editMode.bindEvent.calls[0].args[0].onClick();
+                    editMode.bindEvent.calls.first().args[0].onClick();
                 });
 
                 it('edit mode renderer is opened', function () {
@@ -420,7 +420,7 @@ describe('application.pages', function () {
 
                     beforeEach(function () {
                         i18nResolveDeferred.resolve('brand name');
-                        rendererScope = editModeRenderer.open.calls[0].args[0].scope;
+                        rendererScope = editModeRenderer.open.calls.first().args[0].scope;
                         scope.$digest();
                     });
 

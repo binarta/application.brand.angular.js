@@ -1,0 +1,5 @@
+{
+  "default": {
+    "application.brand":"bower_components/binarta.application.brand.angular/src/application.brand.js"
+  }
+}
