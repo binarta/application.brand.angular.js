@@ -9,7 +9,7 @@
     "binarta.angularx": "0.*.*",
     "binarta.config.angular": "0.*.*",
     "binarta.toggle.edit.mode.angular": "1.*.*",
-    "binarta.i18n.angular": "1.*.*",
+    "binarta.i18n.angular": "2.*.*",
     "binarta.images.angular": "0.*.*"
   },
   "devDependencies": {
