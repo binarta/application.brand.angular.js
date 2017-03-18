@@ -1,22 +1,18 @@
 (function () {
     'use strict';
-    angular.module('application.brand', ['config', 'toggle.edit.mode', 'i18n', 'image-management'])
-        .directive('applicationBrand', ['$q', '$window', 'config', 'configReader', 'configWriter', 'i18n', 'editMode', 'editModeRenderer', 'imageManagement', ApplicationBrandDirective]);
+    angular.module('application.brand', ['binarta-applicationjs-angular1', 'config', 'toggle.edit.mode', 'i18n', 'image-management'])
+        .directive('applicationBrand', ['$q', '$window', 'config', 'configWriter', 'i18n', 'editMode', 'editModeRenderer', 'imageManagement', 'binarta', ApplicationBrandDirective]);
 
-    function ApplicationBrandDirective($q, $window, config, configReader, configWriter, i18n, editMode, editModeRenderer, imageManagement) {
+    function ApplicationBrandDirective($q, $window, config, configWriter, i18n, editMode, editModeRenderer, imageManagement, binarta) {
         return {
             restrict: 'A',
             scope: true,
             link: function (scope, element) {
-                configReader({
-                    $scope: {},
-                    scope: 'public',
-                    key: 'application.brand.name.visible'
-                }).then(function (result) {
-                    scope.brandNameVisible = result.data.value == 'true';
-                    scope.brandNameVisible ? resolveName(scope) : resolveLogoPath(scope);
-                }, function () {
-                    resolveLogoPath(scope);
+                binarta.schedule(function () {
+                    scope.$on('$destroy', binarta.application.config.observePublic('application.brand.name.visible', function (result) {
+                        scope.brandNameVisible = result == 'true';
+                        scope.brandNameVisible ? resolveName(scope) : resolveLogoPath(scope);
+                    }).disconnect);
                 });
 
                 function resolveName(scope) {
@@ -40,7 +36,7 @@
                     });
                 }
 
-                function open () {
+                function open() {
                     var file;
                     var rendererScope = scope.$new();
                     if (scope.brandNameVisible) {
@@ -171,51 +167,51 @@
                         '<div class="bin-menu-edit-body">' +
 
                         '<div ng-show="working">' +
-                            '<i class="fa fa-spinner fa-spin"></i> ' +
-                            '<span ng-switch="workingState">' +
-                                '<span ng-switch-when="logo.uploading" i18n code="application.brand.logo.uploading" read-only ng-bind="::var"></span>' +
-                                '<span ng-switch-default i18n code="application.brand.saving" read-only ng-bind="::var"></span>' +
-                            '</span>' +
+                        '<i class="fa fa-spinner fa-spin"></i> ' +
+                        '<span ng-switch="workingState">' +
+                        '<span ng-switch-when="logo.uploading" i18n code="application.brand.logo.uploading" read-only ng-bind="::var"></span>' +
+                        '<span ng-switch-default i18n code="application.brand.saving" read-only ng-bind="::var"></span>' +
+                        '</span>' +
                         '</div>' +
 
                         '<table class="table" ng-hide="working">' +
-                            '<tr>' +
-                                '<th colspan="2" i18n code="application.brand.choose.one" read-only ng-bind="::var"></th>' +
-                            '</tr>' +
-                            '<tr ng-repeat="v in violations">' +
-                                '<th colspan="2" class="text-danger" i18n code="upload.image.{{::v}}" default="{{::v}}" read-only>' +
-                                    '<i class="fa fa-exclamation-triangle fa-fw"></i> {{::var}}' +
-                                '</th>' +
-                            '</tr>' +
-                            '<tr ng-if="workingState == \'error\'">' +
-                                '<th colspan="2" class="text-danger" i18n code="application.brand.error" read-only>' +
-                                    '<i class="fa fa-exclamation-triangle fa-fw"></i> {{::var}}' +
-                                '</th>' +
-                            '</tr>' +
-                            '<tr ng-class="{\'active\': choice == \'name\'}">' +
-                                '<td style="width:90px; padding-top: 30px; padding-bottom: 30px;">' +
-                                    '<input type="radio" name="applicationBrandRadios" id="applicationBrandName" ng-model="choice" value="name">' +
-                                    '<label for="applicationBrandName"><span i18n code="application.brand.choice.name" read-only ng-bind="::var"></span></label>' +
-                                '</td>' +
-                                '<td>' +
-                                    '<input type="text" class="form-control" ng-model="brandName" ng-disabled="choice != \'name\'">' +
-                                '</td>' +
-                            '</tr>' +
-                            '<tr ng-class="{\'active\': choice == \'logo\'}">' +
-                                '<td style="width:90px; padding-top: 30px; padding-bottom: 30px;">' +
-                                    '<input type="radio" name="applicationBrandRadios" id="applicationBrandLogo" ng-model="choice" value="logo">' +
-                                    '<label for="applicationBrandLogo"><span i18n code="application.brand.choice.logo" read-only ng-bind="::var"></span></label>' +
-                                '</td>' +
-                                '<td>' +
-                                    '<div style="margin-top:15px;">' +
-                                        '<img ng-src="{{logoSrc}}" style="max-width:160px; margin: 0 15px 15px 0;">' +
-                                        '<button type="button" class="btn btn-default" ng-click="browseLogo()" ' +
-                                            'i18n code="application.brand.browse.button" read-only ng-bind="::var" ' +
-                                            'ng-show="choice == \'logo\'" style="margin: 0 15px 15px 0;">' +
-                                        '</button>' +
-                                    '</div>' +
-                                '</td>' +
-                            '</tr>' +
+                        '<tr>' +
+                        '<th colspan="2" i18n code="application.brand.choose.one" read-only ng-bind="::var"></th>' +
+                        '</tr>' +
+                        '<tr ng-repeat="v in violations">' +
+                        '<th colspan="2" class="text-danger" i18n code="upload.image.{{::v}}" default="{{::v}}" read-only>' +
+                        '<i class="fa fa-exclamation-triangle fa-fw"></i> {{::var}}' +
+                        '</th>' +
+                        '</tr>' +
+                        '<tr ng-if="workingState == \'error\'">' +
+                        '<th colspan="2" class="text-danger" i18n code="application.brand.error" read-only>' +
+                        '<i class="fa fa-exclamation-triangle fa-fw"></i> {{::var}}' +
+                        '</th>' +
+                        '</tr>' +
+                        '<tr ng-class="{\'active\': choice == \'name\'}">' +
+                        '<td style="width:90px; padding-top: 30px; padding-bottom: 30px;">' +
+                        '<input type="radio" name="applicationBrandRadios" id="applicationBrandName" ng-model="choice" value="name">' +
+                        '<label for="applicationBrandName"><span i18n code="application.brand.choice.name" read-only ng-bind="::var"></span></label>' +
+                        '</td>' +
+                        '<td>' +
+                        '<input type="text" class="form-control" ng-model="brandName" ng-disabled="choice != \'name\'">' +
+                        '</td>' +
+                        '</tr>' +
+                        '<tr ng-class="{\'active\': choice == \'logo\'}">' +
+                        '<td style="width:90px; padding-top: 30px; padding-bottom: 30px;">' +
+                        '<input type="radio" name="applicationBrandRadios" id="applicationBrandLogo" ng-model="choice" value="logo">' +
+                        '<label for="applicationBrandLogo"><span i18n code="application.brand.choice.logo" read-only ng-bind="::var"></span></label>' +
+                        '</td>' +
+                        '<td>' +
+                        '<div style="margin-top:15px;">' +
+                        '<img ng-src="{{logoSrc}}" style="max-width:160px; margin: 0 15px 15px 0;">' +
+                        '<button type="button" class="btn btn-default" ng-click="browseLogo()" ' +
+                        'i18n code="application.brand.browse.button" read-only ng-bind="::var" ' +
+                        'ng-show="choice == \'logo\'" style="margin: 0 15px 15px 0;">' +
+                        '</button>' +
+                        '</div>' +
+                        '</td>' +
+                        '</tr>' +
                         '</table>' +
 
                         '</div>' +
