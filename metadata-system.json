@@ -17,13 +17,13 @@
       "application.brand.logo.uploading": "Uploading...",
       "application.brand.error": "Something went wrong. Please try again."
     }, "fr":{
-      "application.brand.choose.one": "Choose one:",
-      "application.brand.choice.name": "Text",
+      "application.brand.choose.one": "Choisir:",
+      "application.brand.choice.name": "Texte",
       "application.brand.choice.logo": "Logo",
-      "application.brand.browse.button": "browse",
-      "application.brand.saving": "Saving...",
-      "application.brand.logo.uploading": "Uploading...",
-      "application.brand.error": "Something went wrong. Please try again."
+      "application.brand.browse.button": "parcourir",
+      "application.brand.saving": "Enregistrement...",
+      "application.brand.logo.uploading": "Téléchargement...",
+      "application.brand.error": "Quelque chose a mal tourné. Veuillez réessayer."
     }, "de":{
       "application.brand.choose.one": "Choose one:",
       "application.brand.choice.name": "Text",
