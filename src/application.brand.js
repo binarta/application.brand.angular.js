@@ -1,7 +1,8 @@
 (function () {
     'use strict';
     angular.module('application.brand', ['binarta-applicationjs-angular1', 'config', 'toggle.edit.mode', 'i18n', 'image-management'])
-        .directive('applicationBrand', ['$q', '$window', 'config', 'configWriter', 'i18n', 'editMode', 'editModeRenderer', 'imageManagement', 'binarta', ApplicationBrandDirective]);
+        .directive('applicationBrand', ['$q', '$window', 'config', 'configWriter', 'i18n', 'editMode', 'editModeRenderer', 'imageManagement', 'binarta', ApplicationBrandDirective])
+        .component('binBrand', new BinBrandComponent());
 
     function ApplicationBrandDirective($q, $window, config, configWriter, i18n, editMode, editModeRenderer, imageManagement, binarta) {
         return {
@@ -232,5 +233,12 @@
                 });
             }
         };
+    }
+
+    function BinBrandComponent() {
+        this.template = '<a bin-href="/" application-brand ng-switch="brandNameVisible">' +
+            '<img ng-src="{{logoSrc}}" alt="{{brandName}}" ng-switch-when="false">' +
+            '<h1 ng-bind="brandName" ng-switch-when="true"></h1>' +
+            '</a>';
     }
 })();
