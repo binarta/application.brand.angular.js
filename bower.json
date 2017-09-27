@@ -1,10 +1,6 @@
 {
   "name": "binarta.application.brand.angular",
-  "main": [
-    "./src/application.brand.js",
-    "./metadata-system.json",
-    "./sources.json"
-  ],
+  "main": "./src/application.brand.js",
   "dependencies": {
     "binarta.angularx": "0.*.*",
     "binarta.config.angular": "0.*.*",
