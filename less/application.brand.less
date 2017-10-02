@@ -3,15 +3,19 @@ bin-brand {
   line-height: 1em;
   position: relative;
 
-  a {
+  * {
     display: inline-block;
+  }
 
-    &:before {
-      content: '';
-      display: inline-block;
-      width: 0;
-      height: 100%;
-      vertical-align: middle;
+  a {
+    & > div {
+      &:before {
+        content: '';
+        display: inline-block;
+        width: 0;
+        height: 100%;
+        vertical-align: middle;
+      }
     }
 
     &:hover, &:focus {
@@ -21,7 +25,6 @@ bin-brand {
     img, h1 {
       max-width: 100%;
       height: auto;
-      display: inline-block;
       vertical-align: middle;
     }
 
