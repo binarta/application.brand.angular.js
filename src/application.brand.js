@@ -369,7 +369,6 @@
 
                 observers.push(applicationBrand.observeIsNameVisible(function (result) {
                     $ctrl.isBrandNameVisible = result;
-                    $ctrl.isBrandNameVisible ? $element.addClass('name') : $element.removeClass('name');
                 }));
 
                 observers.push(applicationBrand.observeBrandName(function (name) {
