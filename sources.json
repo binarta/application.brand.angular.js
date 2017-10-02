@@ -1,5 +1,6 @@
 {
   "default": {
-    "application.brand":"bower_components/binarta.application.brand.angular/src/application.brand.js"
+    "application.brand":"bower_components/binarta.application.brand.angular/src/application.brand.js",
+    "application.brand.templates":"bower_components/binarta.application.brand.angular/src/application.brand-tpls-bootstrap3.js"
   }
 }

@@ -1,7 +1,7 @@
 describe('application.pages', function () {
     var $window, $rootScope, $q, config, configReader, configWriter, editMode, editModeRenderer, i18n, imageManagement;
     var configReaderDeferred, configWriterDeferred, i18nResolveDeferred, i18nTranslateDeferred, getImagePathDeferred, uploadDeferred;
-    var fileUploadClicked;
+    var fileUploadClicked, binarta;
     var _file = {
         size: 2000,
         type: 'image/jpeg',
@@ -37,6 +37,7 @@ describe('application.pages', function () {
 
             this.resolve = jasmine.createSpy('translate').and.returnValue(i18nResolveDeferred.promise);
             this.translate = jasmine.createSpy('resolve').and.returnValue(i18nTranslateDeferred.promise);
+            this.observe = jasmine.createSpy('observe').and.returnValue({disconnect: function () {}});
         }]);
 
     angular.module('image-management', [])
@@ -57,7 +58,7 @@ describe('application.pages', function () {
     beforeEach(module('application.brand'));
 
     beforeEach(inject(function (_$window_, _$rootScope_, _config_, _configReader_, _configWriter_, _editMode_, _editModeRenderer_,
-                                _i18n_, _imageManagement_) {
+                                _i18n_, _imageManagement_, _binarta_) {
         $window = _$window_;
         $rootScope = _$rootScope_;
         config = _config_;
@@ -67,6 +68,9 @@ describe('application.pages', function () {
         editModeRenderer = _editModeRenderer_;
         i18n = _i18n_;
         imageManagement = _imageManagement_;
+        binarta = _binarta_;
+
+        config.namespace = 'N';
 
         $window.URL = {
             createObjectURL: function (file) {
@@ -77,6 +81,361 @@ describe('application.pages', function () {
 
         fileUploadClicked = false;
     }));
+
+    function triggerBinartaSchedule() {
+        binarta.application.adhesiveReading.read('-');
+    }
+
+    describe('applicationBrand service', function () {
+        var sut;
+
+        beforeEach(inject(function (applicationBrand) {
+            sut = applicationBrand;
+        }));
+
+        it('assert logo id', function () {
+            expect(sut.logoId).toEqual('brand-logo.img');
+        });
+
+        describe('on observeIsNameVisible', function () {
+            var actual, returnValue;
+
+            beforeEach(function () {
+                returnValue = sut.observeIsNameVisible(function (result) {
+                    actual = result;
+                });
+            });
+
+            it('with nothing in config', function () {
+                expect(actual).toEqual(false);
+            });
+
+            it('with config value', function () {
+                binarta.application.config.cache('application.brand.name.visible', 'true');
+                triggerBinartaSchedule();
+                expect(actual).toEqual(true);
+            });
+
+            it('when config returns a boolean', function () {
+                binarta.application.config.cache('application.brand.name.visible', true);
+                triggerBinartaSchedule();
+                expect(actual).toEqual(true);
+            });
+
+            it('returns the observer disconnect function', function () {
+                expect(returnValue.disconnect).toBeDefined();
+            });
+        });
+
+        describe('on observeBrandName', function () {
+            var actual, returnValue;
+
+            beforeEach(function () {
+                returnValue = sut.observeBrandName(function (result) {
+                    actual = result;
+                });
+            });
+
+            it('observe brand name', function () {
+                expect(i18n.observe.calls.mostRecent().args[0]).toEqual('application.brand.name');
+            });
+
+            it('fallback to namespace and use default locale', function () {
+                expect(i18n.observe.calls.mostRecent().args[2]).toEqual({default: 'N', locale: 'default'});
+            });
+
+            it('on callback', function () {
+                i18n.observe.calls.mostRecent().args[1]('name');
+                expect(actual).toEqual('name');
+            });
+        });
+
+        describe('on edit', function () {
+            var rendererScope;
+
+            beforeEach(function () {
+                sut.edit();
+                triggerBinartaSchedule();
+                rendererScope = editModeRenderer.open.calls.mostRecent().args[0].scope;
+            });
+
+            it('choice is on rendererScope', function () {
+                expect(rendererScope.choice).toEqual('logo');
+            });
+
+            describe('when name was active', function () {
+                beforeEach(function () {
+                    binarta.application.config.cache('application.brand.name.visible', 'true');
+                    sut.edit();
+                    rendererScope = editModeRenderer.open.calls.mostRecent().args[0].scope;
+                });
+
+                it('choice is on rendererScope', function () {
+                    expect(rendererScope.choice).toEqual('name');
+                });
+            });
+
+            it('brand name is requested', function () {
+                expect(i18n.resolve).toHaveBeenCalledWith({
+                    code: 'application.brand.name',
+                    default: 'N',
+                    locale: 'default'
+                });
+            });
+
+            it('on brand name resolved', function () {
+                i18nResolveDeferred.resolve('brand name');
+                rendererScope.$digest();
+                expect(rendererScope.brandName).toEqual('brand name');
+            });
+
+            it('logo image path is requested', function () {
+                expect(imageManagement.getImagePath).toHaveBeenCalledWith({
+                    code: sut.logoId,
+                    height: 80
+                });
+            });
+
+            it('on image path resolved', function () {
+                getImagePathDeferred.resolve('path');
+                rendererScope.$digest();
+                expect(rendererScope.logoSrc).toEqual('path');
+            });
+
+            describe('with resolved values', function () {
+                beforeEach(function () {
+                    i18nResolveDeferred.resolve('brand name');
+                    getImagePathDeferred.resolve('path');
+                    rendererScope.$digest();
+                });
+
+                describe('on browse logo', function () {
+                    beforeEach(function () {
+                        rendererScope.browseLogo();
+                    });
+
+                    it('fileupload is triggered', function () {
+                        expect(imageManagement.fileUpload).toHaveBeenCalledWith({
+                            dataType: 'json',
+                            add: jasmine.any(Function)
+                        });
+
+                        expect(fileUploadClicked).toBeTruthy();
+                    });
+
+                    describe('new valid logo is selected', function () {
+                        beforeEach(function () {
+                            imageManagement.validate.and.returnValue([]);
+                            imageManagement.fileUpload.calls.first().args[0].add(null, validFile);
+                        });
+
+                        it('logo is validated', function () {
+                            expect(imageManagement.validate).toHaveBeenCalledWith(validFile);
+                        });
+
+                        it('object url is on rendererScope', function () {
+                            expect($window.URL.createObjectURLSpy).toEqual(_file);
+                            expect(rendererScope.logoSrc).toEqual('objectUrl');
+                        })
+                    });
+
+                    describe('new invalid logo is selected', function () {
+                        beforeEach(function () {
+                            imageManagement.validate.and.returnValue(['invalid']);
+                            imageManagement.fileUpload.calls.first().args[0].add(null, {});
+                        });
+
+                        it('violations are on rendererScope', function () {
+                            expect(rendererScope.violations).toEqual(['invalid']);
+                        });
+
+                        it('logo src is not changed', function () {
+                            expect(rendererScope.logoSrc).toEqual('path');
+                        });
+                    });
+                });
+
+                describe('on save and nothing changed', function () {
+                    beforeEach(function () {
+                        rendererScope.save();
+                    });
+
+                    it('system is in working state', function () {
+                        expect(rendererScope.working).toBeTruthy();
+                    });
+
+                    it('config is not changed, no update required', function () {
+                        expect(configWriter).not.toHaveBeenCalled();
+                    });
+
+                    it('brand name is not changed, no update required', function () {
+                        expect(i18n.translate).not.toHaveBeenCalled();
+                    });
+
+                    it('logo is not changed, no update required', function () {
+                        expect(imageManagement.upload).not.toHaveBeenCalled();
+                    });
+
+                    it('when done, close renderer', function () {
+                        rendererScope.$digest();
+
+                        expect(editModeRenderer.close).toHaveBeenCalled();
+                    });
+                });
+
+                describe('on save and logo changed', function () {
+                    beforeEach(function () {
+                        rendererScope.browseLogo();
+                        imageManagement.validate.and.returnValue([]);
+                        imageManagement.fileUpload.calls.first().args[0].add(null, validFile);
+
+                        rendererScope.save();
+                    });
+
+                    it('system is in working state', function () {
+                        expect(rendererScope.working).toBeTruthy();
+                    });
+
+                    it('config is not changed, no update required', function () {
+                        expect(configWriter).not.toHaveBeenCalled();
+                    });
+
+                    it('brand name is not changed, no update required', function () {
+                        expect(i18n.translate).not.toHaveBeenCalled();
+                    });
+
+                    describe('update logo', function () {
+                        it('set working state', function () {
+                            expect(rendererScope.workingState).toEqual('logo.uploading');
+                        });
+
+                        it('upload image', function () {
+                            expect(imageManagement.upload).toHaveBeenCalledWith({
+                                file: jasmine.any(Object),
+                                code: 'brand-logo.img'
+                            });
+                        });
+
+                        describe('when upload fails', function () {
+                            beforeEach(function () {
+                                uploadDeferred.reject();
+                                rendererScope.$digest();
+                            });
+
+                            it('set violation', function () {
+                                expect(rendererScope.workingState).toEqual('error');
+                            });
+
+                            it('disable working state', function () {
+                                expect(rendererScope.working).toBeFalsy();
+                            });
+
+                            it('renderer is not closed', function () {
+                                expect(editModeRenderer.close).not.toHaveBeenCalled();
+                            });
+                        });
+
+                        describe('when upload succeeds', function () {
+                            beforeEach(function () {
+                                getImagePathDeferred.resolve('new image path');
+                                uploadDeferred.resolve();
+                                rendererScope.$digest();
+                            });
+
+                            it('close renderer', function () {
+                                expect(editModeRenderer.close).toHaveBeenCalled();
+                            });
+                        });
+                    });
+                });
+
+                describe('when brand name is selected', function () {
+                    beforeEach(function () {
+                        rendererScope.choice = 'name';
+                    });
+
+                    describe('on browse logo', function () {
+                        beforeEach(function () {
+                            rendererScope.browseLogo();
+                        });
+
+                        it('fileupload is not triggered', function () {
+                            expect(imageManagement.fileUpload).not.toHaveBeenCalled();
+                            expect(fileUploadClicked).toBeFalsy();
+                        });
+                    });
+
+                    describe('on save and brand name is changed', function () {
+                        beforeEach(function () {
+                            rendererScope.brandName = 'new brand name';
+                            rendererScope.save();
+                        });
+
+                        it('set working state', function () {
+                            expect(rendererScope.workingState).toEqual('name.updating');
+                        });
+
+                        it('logo is not changed, no update required', function () {
+                            expect(imageManagement.upload).not.toHaveBeenCalled();
+                        });
+
+                        it('config is updated', function () {
+                            expect(configWriter).toHaveBeenCalledWith({
+                                $scope: {},
+                                scope: 'public',
+                                key: 'application.brand.name.visible',
+                                value: true
+                            });
+                        });
+
+                        it('brand name is updated', function () {
+                            expect(i18n.translate).toHaveBeenCalledWith({
+                                code: 'application.brand.name',
+                                translation: 'new brand name',
+                                locale: 'default'
+                            });
+                        });
+
+                        describe('when update fails', function () {
+                            beforeEach(function () {
+                                i18nTranslateDeferred.reject();
+                                rendererScope.$digest();
+                            });
+
+                            it('set violation', function () {
+                                expect(rendererScope.workingState).toEqual('error');
+                            });
+
+                            it('disable working state', function () {
+                                expect(rendererScope.working).toBeFalsy();
+                            });
+
+                            it('renderer is not closed', function () {
+                                expect(editModeRenderer.close).not.toHaveBeenCalled();
+                            });
+                        });
+
+                        describe('when update succeeds', function () {
+                            beforeEach(function () {
+                                i18nTranslateDeferred.resolve();
+                                configWriterDeferred.resolve();
+                                rendererScope.$digest();
+                            });
+
+                            it('close renderer', function () {
+                                expect(editModeRenderer.close).toHaveBeenCalled();
+                            });
+                        });
+                    });
+                });
+            });
+
+            it('on close', function () {
+                rendererScope.close();
+                expect(editModeRenderer.close).toHaveBeenCalled();
+            });
+        });
+    });
 
     describe('applicationBrand directive', function () {
         var scope, html, element;
@@ -303,7 +662,7 @@ describe('application.pages', function () {
 
                 it('edit mode renderer is opened', function () {
                     expect(editModeRenderer.open).toHaveBeenCalledWith({
-                        template: jasmine.any(String),
+                        templateUrl: 'bin-application-brand-edit.html',
                         scope: jasmine.any(Object)
                     });
                 });
