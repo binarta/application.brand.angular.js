@@ -8,14 +8,11 @@ bin-brand {
   }
 
   a {
-    & > div {
-      &:before {
-        content: '';
-        display: inline-block;
-        width: 0;
-        height: 100%;
-        vertical-align: middle;
-      }
+    .valign-fix {
+      display: inline-block;
+      width: 0;
+      height: 100%;
+      vertical-align: middle;
     }
 
     &:hover, &:focus {

@@ -349,10 +349,9 @@
 
     function BinBrandComponent() {
         this.template = '<a bin-href="/" ng-style="::{minHeight: $ctrl.logoHeight + \'px\'}" ng-switch="$ctrl.isBrandNameVisible">' +
-            '<div ng-style="::{height: $ctrl.logoHeight + \'px\'}" ng-switch-when="false">' +
+            '<div class="valign-fix" ng-style="::{height: $ctrl.logoHeight + \'px\'}"></div>' +
             '<img bin-image="{{::$ctrl.logoId}}" read-only alt="{{$ctrl.brandName}}" height="{{::$ctrl.logoHeight}}" ' +
-            'ng-style="::{maxHeight: $ctrl.logoHeight + \'px\'}">' +
-            '</div>' +
+            'ng-style="::{maxHeight: $ctrl.logoHeight + \'px\'}" ng-switch-when="false">' +
             '<h1 ng-bind="$ctrl.brandName" ng-switch-when="true"></h1>' +
             '</a>';
 
