@@ -191,8 +191,6 @@
                         locale: 'default'
                     }).then(function (translation) {
                         scope.brandName = translation;
-                    }, function () {
-                        scope.brandName = config.namespace;
                     });
                 }
 
